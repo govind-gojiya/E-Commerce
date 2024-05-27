@@ -1,3 +1,7 @@
 from django.test import TestCase
 
 # Create your tests here.
+{
+    "refresh": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTcxNjI3OTkyOSwiaWF0IjoxNzE2MTkzNTI5LCJqdGkiOiIxZjIwM2VlMzhhMTc0YWI2OTkxMGFkZTE2ZTQ2YmM0NiIsInVzZXJfaWQiOjR9.siclJ99XlMh65qLNot6t30eyA31IWsHzZdDLee48zZo",
+    "access": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzE2MTkzODI5LCJpYXQiOjE3MTYxOTM1MjksImp0aSI6ImQ4NTI1MTQ1N2Y1YzQ2YTg5ZDY4ZjA4NjEyM2FiMTIzIiwidXNlcl9pZCI6NH0.YAiGYmHOvC_o_uL1hyFVvnNzP1Ohq4WcDKmOnATubtE"
+}

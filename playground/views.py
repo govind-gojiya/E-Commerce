@@ -1,14 +1,25 @@
 from django.shortcuts import render
-from django.http import HttpResponse
-from store.models import Product, Customer,Collection, Order, OrderItem
+from django.contrib.contenttypes.models import ContentType
+from django.core.cache import cache
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.mail import send_mail, mail_admins, BadHeaderError, EmailMessage
 from django.db.models import Q, F, Value, Func, Count, ExpressionWrapper, DecimalField
 from django.db.models.aggregates import Max, Min, Avg, Sum
 from django.db.models.functions import Concat
-from django.contrib.contenttypes.models import ContentType
-from tags.models import TaggedItem
 from django.db import transaction
 from django.db import connection
+from django.http import HttpResponse
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
+import logging
+from templated_mail.mail import BaseEmailMessage
+from rest_framework.views import APIView
+import requests
+from tags.models import TaggedItem
+from store.models import Product, Customer,Collection, Order, OrderItem
+from .tasks import notify_customers
+
+logger = logging.getLogger(__name__) # __name__ is playground.views so use this instead of hard code
 
 def say_hello(request):
     # x = 1
@@ -278,4 +289,125 @@ def say_hello(request):
         # to call stored procedure
         # cursor.callproc('get_customer', [1, 2, 'a'])
 
+
+    
+
+    # ============ Mail Sending ============
+    # try:
+        # send_mail('First arg is subject', 'Second arg is message', 'from@localhost.anywhere.com', ['to@localhost.anywhere.com', 'to2@myhost.com'])
+        # mail_admins('First arg is subject', 'Second arg is message', html_message='If Client support html then this message render') # For this specify ADMINS in settigns.py
+
+        # For using cc, bcc and attach and any many more property use base class EmailMessage
+        # message = EmailMessage('subject', 'message', 'frommmm@localhost.anywhere.com')
+        # message.to = ['to@localhost.anywhere.com', 'to2@myhost.com']
+        # message.attach_file('playground/static/images/govind_gojiya.jpeg')
+        # message.send()
+
+        # For sending long and dynamic mail
+        # pip install django-templated-mail
+        # message = BaseEmailMessage(
+        #     template_name='emails/hello.html',
+        #     context={'name': 'Govind', 'subject': 'This is the subject'}
+        # )
+        # message.send(['to@localhost.anywhere.com', 'to2@myhost.com'])
+    # except BadHeaderError as e:
+    #     print("Error: ", e)
+
+
+
+
+
+    # ============ Celery background task ============
+
+    # notify_customers.delay('Hello')
+    
+
+
+
+    # ============ Testing ============
+    # 1. pytest 
+        # Automated testing go to store > tests > test_collections.py to start with
+        # pip install pytest pytest-django
+        # Run: 
+            # pytest
+            # pytest filepath
+            # pytest filepath::classname
+            # pytest filepath::classname::test_method_name
+            # pytest -k word_that_should_be_called
+
+    # 2. locust
+        # Permonace testing go to locustfiles > browse_products.py
+        # Use for stress testing too by observation
+        # pip install locust
+        # Run :
+            # locust -f filename
+            # goto http://0.0.0.0:8089/
+            # to watch over on the website for permance testing
+
+    # 3. silk
+        # Profiling
+        # pip install django-silk
+        # search for django silk github repo and follow step to integrate
+
+    
+
+
+    # ============ Caching ============
+    # search for django redis github
+    # follow step to integrate
+
+    # key = 'httpbin_result'
+    # if cache.get(key) is None:
+    #     response = requests.get("https://httpbin.org/delay/2")
+    #     data = response.json()
+    #     cache.set(key, data)
+    #     # Also pass 3rd args int for timeout
+    # return render(request, 'index.html', {'name': cache.get(key)})
+
+    
+    
+    
+    
+    # ============ Fast and robust webserver for production ============
+    # gunicorn - stands for green unicorn
+    # use it for production for fast and robust webserver
+    # it will not reload as the code change, we have to manully restart the server
+    # pip install gunicorn
+    # Run like this:
+        # gunicorn storefront.wsgi
+        # gunicorn --bind 0.0.0.0:8000 storefront.wsgi:application
+        # gunicorn --bind 0.0.0.0:8000 storefront.wsgi:application --workers 3 --threads 2 --worker-class gevent
+        # gunicorn --bind 0.0.0.0:8000 storefront.wsgi:application --workers 3 --threads 2 --worker-class gevent --worker-connections 1000
+        # gunicorn --bind 0.0.0.0:8000 storefront.wsgi:application --workers 3 --threads 2 --worker-class gevent --worker-connections 1000 --log-level debug
+
     return render(request, 'index.html', {'name': 'govind !'})
+
+
+# For caching in fbv and cbv
+# To see cache follow below commands
+# docker exec -it container_id redis-cli
+# ---------------- In Redis database not have name it have number so here i used 1 for message broker and 2 for cache
+# select number_of_database  
+# To see all cache data: keys *
+# To delete perticular data: del name_of_key
+# To clear all cache data: flushall  
+
+@cache_page(5 * 60)
+def chache_hello(request):
+    try:
+        logger.info("Calling httpbin ...")
+        response = requests.get("https://httpbin.org/delay/2")
+        data = response.json()
+        logging.info("Get response from httpbin")
+    except Exception as e:
+        logging.error("httpbin server is down: %s" % e)
+    return render(request, 'index.html', {'name': 'Govind !'})
+
+
+class chache_cbv_hello(APIView):
+
+    @method_decorator(cache_page(5 * 60))
+    def get(self, request):
+        response = requests.get("https://httpbin.org/delay/2")
+        data = response.json()
+        return render(request, 'index.html', {'name': 'Govind !'})
