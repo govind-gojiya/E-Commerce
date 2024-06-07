@@ -17,3 +17,5 @@ class Command(BaseCommand):
 
         with connection.cursor() as cursor:
             cursor.execute(sql)
+            cursor.execute("SELECT pg_catalog.setval('store_product_id_seq',(SELECT max(id) FROM store_product),true);")
+            cursor.execute("SELECT pg_catalog.setval('store_collection_id_seq',(SELECT max(id) FROM store_collection),true);")

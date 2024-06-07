@@ -1,4 +1,7 @@
+import dj_database_url
 from .common import *
+# import os
+# os.environ['DATABASE_URL'] = 'postgres://expense_manager:Hff7F5TIncPLGJ0lpHHxRGLPB1vJE10S@dpg-cotiss7109ks73alljag-a.oregon-postgres.render.com/expense_tracker_3m5h'
 
 DEBUG = True
 
@@ -13,6 +16,7 @@ DATABASES = {
         'PASSWORD': 'abc123',
         'PORT': '5432',
     }
+    # 'default': dj_database_url.config()
 }
 
 CELERY_BROKER_URL = 'redis://localhost:6379/1'# last 1 show database name it can be any 1,2,3...
@@ -39,3 +43,5 @@ CACHES = {
         "TIMEOUT": 10 * 60 # Default is 5 minutes we can change to 10 minutes like this
     }
 }
+
+ALLOWED_HOSTS = ["asked-solved-sheets-activists.trycloudflare.com"]
