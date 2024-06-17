@@ -1,0 +1,29 @@
+version: "3.7"
+
+services:
+  backend:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000 --noreload
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+    environment:
+      DJANGO_SETTINGS_MODULE: storefront.settings.prod
+      SECRET_KEY: django-insecure-pvj49yk8p0jhd-72+x#l=8f3cif5kwxpt$yki)fjz(dxj(gvin
+      DATABASE_HOST: postgres
+      DATABASE_NAME: storefront
+      DATABASE_USER: storefrontuser
+      DATABASE_PASSWORD: storefront@123
+      DATABASE_PORT: 5432
+
+  postgres:
+    container_name: postgres
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_USER: storefrontuser
+      POSTGRES_PASSWORD: storefront@123
+      POSTGRES_DB: storefront
+    ports:
+      - "5438:5432"

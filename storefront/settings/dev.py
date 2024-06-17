@@ -1,4 +1,4 @@
-import dj_database_url
+# import dj_database_url
 from .common import *
 # import os
 # os.environ['DATABASE_URL'] = 'postgres://expense_manager:Hff7F5TIncPLGJ0lpHHxRGLPB1vJE10S@dpg-cotiss7109ks73alljag-a.oregon-postgres.render.com/expense_tracker_3m5h'

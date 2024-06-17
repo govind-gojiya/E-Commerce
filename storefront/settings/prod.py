@@ -4,7 +4,7 @@ DEBUG = False
 
 SECRET_KEY = os.environ['SECRET_KEY']
 
-ALLOWED_HOSTS = ["e-commerce-edw3.onrender.com", "asked-solved-sheets-activists.trycloudflare.com"]
+ALLOWED_HOSTS = ["e-commerce-edw3.onrender.com", "asked-solved-sheets-activists.trycloudflare.com", "*", 'localhost']
 
 DATABASES = {
     'default': {
@@ -13,6 +13,6 @@ DATABASES = {
         'HOST': os.environ.get('DATABASE_HOST'),
         'USER': os.environ.get('DATABASE_USER'),
         'PASSWORD': os.environ.get('DATABASE_PASSWORD'),
-        'PORT': '5432',
+        'PORT': os.environ.get('DATABASE_PORT', '5432'),
     }
 }
